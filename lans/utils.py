@@ -1,9 +1,10 @@
 import os
+from shutil import copyfile
 from typing import Dict, List
 
 import torch
 
-from lans.config import PREDICTION_OUTPUT_DIR
+from lans.config import PREDICTION_OUTPUT_DIR, ROOT_DIR
 from lans.constants import EOW, TOKEN_ID, SENT_ID, FORM
 import pandas as pd
 import csv
@@ -32,6 +33,12 @@ def save_pred_sentences(pred_sentences: List[List[str]], exp_name:str):
             for word in sentence:
                 f.write(word + '\n')
             f.write('\n')
+
+    ## save config file
+    config_path = os.path.join(ROOT_DIR, 'lans', 'config.py')
+    config_save_path = os.path.join(PREDICTION_OUTPUT_DIR, exp_name, 'config.py')
+    copyfile(config_path, config_save_path)
+
 
 def txt2df(path) -> pd.DataFrame:
     df = pd.read_csv(path, names=['form'], sep=' ', header=None, skip_blank_lines=False, quoting=csv.QUOTE_NONE)

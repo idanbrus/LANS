@@ -5,11 +5,11 @@ import os
 from pytorch_lightning import Trainer
 from pytorch_lightning.loggers import TensorBoardLogger
 
-from lans.lans.config import MAX_EPOCHS, GPU_ID, TENSORBOARD_DIR, EMB_TYPE, SAVED_MODEL_PATH, \
+from lans.config import MAX_EPOCHS, GPU_ID, TENSORBOARD_DIR, EMB_TYPE, SAVED_MODEL_PATH, \
     PREPROCESSING_CACHE_DIR, CHECK_VAL_EVERY, EXPERIMENT_NAME
-from lans.lans.data_preperation.tree_bank_loader import preprocess_conll_file
-from lans.lans.models.segmentors.bert_segmentor import BertSegmentor
-from lans.lans.models.segmentors.zeros_segmentor import ZerosSegmentor
+from lans.data_preperation.tree_bank_loader import preprocess_conll_file
+from lans.models.segmentors.bert_segmentor import BertSegmentor
+from lans.models.segmentors.zeros_segmentor import ZerosSegmentor
 
 segmentor_options = {'zeros': ZerosSegmentor,
                      'bert': BertSegmentor}

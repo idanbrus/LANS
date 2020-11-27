@@ -2,7 +2,7 @@ from typing import Dict
 
 import pandas as pd
 import torch
-from lans.config import BERT_CHECKPOINT
+from lans.config import BERT_CHECKPOINT, GPU_ID
 from tqdm import tqdm
 from transformers import BertModel, AutoModel, AutoTokenizer, AutoConfig
 
@@ -16,21 +16,21 @@ class BertDataset(BaseDataset):
                  model_checkpoint: str = BERT_CHECKPOINT):
         config = AutoConfig.from_pretrained(model_checkpoint, output_hidden_states=True)
         self.tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
-        self.embedder = AutoModel.from_pretrained(model_checkpoint, config=config)
+        self.embedder = AutoModel.from_pretrained(model_checkpoint, config=config).to(GPU_ID)
         super().__init__(df, char2label_dict, token_embedder, max_word_length)
 
     def _calculate_token_embeddings(self, df: pd.DataFrame, embedder: BertModel):
 
-        embedder.to('cpu')
-        embedder.eval()
+        # embedder.to(GPU_ID)
+        # embedder.eval()
         all_embeddings = []
         for id, sentence_df in tqdm(df.groupby(SENT_ID), desc='Creating Bert Embeddings', unit='sentence'):
             tokens_list = list(sentence_df.groupby(TOKEN_ID).first()[TOKEN_STR])
             sentence = ' '.join(tokens_list)
 
             input_ids = self.tokenizer.encode(sentence)
-            input_ids = torch.tensor(input_ids).unsqueeze(0)  # .to('cpu')
-            token_embeddings = self._creat_embeddings(input_ids)
+            input_ids = torch.tensor(input_ids).unsqueeze(0).to(GPU_ID) # .to('cpu')
+            token_embeddings = self._creat_embeddings(input_ids).to('cpu')
             sent_emb = self._untokenize(tokens_list, token_embeddings)
             # sent_emb = self._untokenize_bpe(tokens_list, token_embeddings)
             all_embeddings.append(sent_emb.data.numpy())
@@ -46,7 +46,8 @@ class BertDataset(BaseDataset):
 
     def _creat_embeddings(self, input_ids):
         max_tokens = 512
-        if input_ids.shape[1] > max_tokens:  # TODO maybe delete this
+        # input_ids
+        if input_ids.shape[1] > max_tokens:
             part1 = self.embedder(input_ids[:, :max_tokens])[0].squeeze()
             part2 = self.embedder(input_ids[:, max_tokens:])[0].squeeze()
             return torch.cat([part1, part2])
