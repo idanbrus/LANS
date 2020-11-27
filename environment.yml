@@ -1,0 +1,11 @@
+name: lans
+channels:
+  - pytorch
+dependencies:
+  - python=3.8
+  - pandas
+  - pytorch >= 1.5
+  - tqdm
+  - pip:
+    - pytorch-lightning==0.9.1
+    - transformers
