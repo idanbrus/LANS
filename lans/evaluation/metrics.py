@@ -1,3 +1,4 @@
+from collections import Counter
 from typing import List
 
 
@@ -46,3 +47,21 @@ def eq_tokens(gt, st):
         return True
     else:
         return gt == st
+
+def pos_tag_eval(gold_df, pred_df):
+    gold_gb = gold_df.groupby([gold_df.sent_id])
+    pred_gb = pred_df.groupby([pred_df.sent_id])
+    gold_counts, pred_counts, intersection_counts = 0, 0, 0
+    for sent_id, gold in sorted(gold_gb):
+        pred = pred_gb.get_group((sent_id))
+        gold_seg_tags = list(zip(gold.upostag.tolist(), gold.form.tolist()))
+        pred_seg_tags = list(zip(pred.upostag.tolist(), pred.form.tolist()))
+        gold_count, pred_count = Counter(gold_seg_tags), Counter(pred_seg_tags)
+        intersection_count = gold_count & pred_count
+        gold_counts += sum(gold_count.values())
+        pred_counts += sum(pred_count.values())
+        intersection_counts += sum(intersection_count.values())
+    precision = intersection_counts / pred_counts if pred_counts else 0.0
+    recall = intersection_counts / gold_counts if gold_counts else 0.0
+    f1 = 2.0 * (precision * recall) / (precision + recall) if precision + recall else 0.0
+    return precision, recall, f1

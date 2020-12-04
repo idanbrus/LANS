@@ -2,8 +2,6 @@ import os
 
 BATCH_SIZE = 128
 MAX_EPOCHS = 30
-# MAX_WORD_LENGTH = 35
-# MAX_MORPHS = 3
 CHECK_VAL_EVERY = 3
 MAX_SENT_LENGTH = 50
 LEARNING_RATE = 1e-3
@@ -12,14 +10,13 @@ DROPOUT_P = 0.5
 HIDDEN_SIZE = 256
 MAX_INPUT_SIZE = 32
 POS_WEIGHT = 0.9
-JOINT_LABELS_COL = 'upostag'
 
-# TEST = False
+JOINT_LABELS_COL = 'upostag'
 EXPERIMENT_NAME = 'example'
 LANGUAGE = 'hebrew'
-# REPEAT_EXP = 1
-EMB_TYPE = 'fasttext' #['zeros', 'bert', 'fasttext']
+EMB_TYPE = 'bert_joint' #['zeros', 'bert', 'fasttext', 'bert_joint]
 BERT_CHECKPOINT = 'bert-base-multilingual-cased'
+# REPEAT_EXP = 1
 # BERT_CHECKPOINT = '/home/nlp/amitse/alephbert/experiments/transformers/bert-wordpiece-64000'
 
 ROOT_DIR = os.path.dirname(os.path.dirname(__file__))

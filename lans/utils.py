@@ -4,8 +4,8 @@ from typing import Dict, List
 
 import torch
 
-from lans.config import PREDICTION_OUTPUT_DIR, ROOT_DIR
-from lans.constants import EOW, TOKEN_ID, SENT_ID, FORM
+from lans.config import PREDICTION_OUTPUT_DIR, ROOT_DIR, JOINT_LABELS_COL
+from lans.constants import EOW, TOKEN_ID, SENT_ID, FORM, NULL_LABEL
 import pandas as pd
 import csv
 from tqdm import tqdm
@@ -55,3 +55,31 @@ def txt2df(path) -> pd.DataFrame:
             token_id = 1
     df['token_str'] = df[FORM]
     return df
+
+def creat_pos_df(tokens_list: List[List[List[str]]], pos_list: List[List[List[str]]]) -> pd.DataFrame:
+    df = pd.DataFrame(columns=[FORM, JOINT_LABELS_COL, SENT_ID])
+    for sent_id, (tokens, pos_tags) in enumerate(zip(tokens_list, pos_list)):
+        tmp_df = _create_token_pos_df(tokens, pos_tags, sent_id)
+        df = df.append(tmp_df)
+    return df
+
+def _create_token_pos_df(tokens_list: List[List[str]], pos_list: List[List[str]], sent_id) -> pd.DataFrame:
+    df = pd.DataFrame(columns=[FORM, JOINT_LABELS_COL, SENT_ID])
+    for tokens, pos_tags in zip(tokens_list, pos_list):
+        if len(pos_tags) > len(tokens):
+            pos_tags = pos_tags[:len(tokens)]
+
+        elif len(pos_tags) < len(tokens):
+            pos_tags = pos_tags + [NULL_LABEL] * (len(tokens) - len(pos_tags))
+        tmp_df = pd.DataFrame({FORM: tokens, JOINT_LABELS_COL: pos_tags, SENT_ID: sent_id})
+        df = df.append(tmp_df)
+    return df
+
+def tensor2token_pos(pos_tensor: torch.Tensor, tokens_tensor: torch.Tensor, space_id: int, pos_dict: Dict):
+    key_dict = {value: key for key, value in pos_dict.items()}
+    mask = tokens_tensor == space_id
+    all_pos_tags = []
+    for token_pos, token_mask in zip(pos_tensor, mask):
+        pos = [key_dict[pos_id.item()] for pos_id, cur_mask in zip(token_pos, token_mask) if cur_mask]
+        all_pos_tags.append(pos)
+    return all_pos_tags

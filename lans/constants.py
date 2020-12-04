@@ -9,5 +9,5 @@ FORM = 'form'
 EOW = 'eow'  # end of word
 SOW = 'sow'  # start of word
 
-NULL_POS = 'null_pos'
-NULL_NER = 'null_ner'
+NULL_LABEL = 'null_pos'
+

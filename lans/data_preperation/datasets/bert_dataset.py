@@ -21,8 +21,7 @@ class BertDataset(BaseDataset):
 
     def _calculate_token_embeddings(self, df: pd.DataFrame, embedder: BertModel):
 
-        # embedder.to(GPU_ID)
-        # embedder.eval()
+
         all_embeddings = []
         for id, sentence_df in tqdm(df.groupby(SENT_ID), desc='Creating Bert Embeddings', unit='sentence'):
             tokens_list = list(sentence_df.groupby(TOKEN_ID).first()[TOKEN_STR])
