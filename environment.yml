@@ -9,3 +9,4 @@ dependencies:
   - pip:
     - pytorch-lightning==0.9.1
     - transformers
+    - fasttext

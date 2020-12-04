@@ -8,11 +8,7 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from lans.config import MAX_EPOCHS, GPU_ID, TENSORBOARD_DIR, EMB_TYPE, SAVED_MODEL_PATH, \
     PREPROCESSING_CACHE_DIR, CHECK_VAL_EVERY, EXPERIMENT_NAME
 from lans.data_preperation.tree_bank_loader import preprocess_conll_file
-from lans.models.segmentors.bert_segmentor import BertSegmentor
-from lans.models.segmentors.zeros_segmentor import ZerosSegmentor
-
-segmentor_options = {'zeros': ZerosSegmentor,
-                     'bert': BertSegmentor}
+from lans.models.segmentors.context_dict import CONTEXT_OPTIONS
 
 
 def main(train_path, dev_path, test_path, experiment_name):
@@ -26,7 +22,7 @@ def main(train_path, dev_path, test_path, experiment_name):
                                                                         'test.csv'))
 
     logging.info(f'Running Experiment: {experiment_name}')
-    segmentor = segmentor_options[EMB_TYPE](train_df=post_processed_train,
+    segmentor = CONTEXT_OPTIONS[EMB_TYPE](train_df=post_processed_train,
                                             dev_df=post_processed_dev,
                                             test_df=post_processed_test,
                                             exp_name=experiment_name)

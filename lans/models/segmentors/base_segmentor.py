@@ -18,7 +18,7 @@ from lans.utils import tensor2sentence, get_sent_lengths, save_pred_sentences
 class BaseSegmentor(LightningModule, abc.ABC):
     def __init__(self, train_df: pd.DataFrame,
                  dev_df: pd.DataFrame,
-                 test_df: str,
+                 test_df: pd.DataFrame,
                  exp_name: str,
                  hidden_size: int = HIDDEN_SIZE,
                  input_size: int = MAX_INPUT_SIZE,
@@ -34,6 +34,8 @@ class BaseSegmentor(LightningModule, abc.ABC):
         self.hidden_size = hidden_size
         self.dropout_p = dropout_p
         self.gpu_id = gpu_num
+        self.embedding_dim = embedding_dim
+        self.input_size = input_size
 
         # prepare the data
         self.char_dict = create_char2label_dict(self.train_df)
@@ -152,5 +154,5 @@ class BaseSegmentor(LightningModule, abc.ABC):
         return self._create_dataloader(self.test_df)
 
     @abc.abstractmethod
-    def _create_dataloader(self, path):
+    def _create_dataloader(self, df:pd.DataFrame):
         raise NotImplementedError
